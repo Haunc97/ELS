@@ -24,6 +24,7 @@ namespace ELS.Persistence.Repositories
             IQueryable<TEntity> query;
 
             query = dbSet;
+
             if (filter != null)
             {
                 query = query.Where(filter);
@@ -47,11 +48,32 @@ namespace ELS.Persistence.Repositories
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null)
         {
-            var result = QueryDb(filter, orderBy, includes);
+            using var db = DbContextFactory.CreateDbContext();
+
+            DbSet<TEntity> dbSet = db.Set<TEntity>();
+            IQueryable<TEntity> query;
+
+            query = dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (includes != null)
+            {
+                query = includes(query);
+            }
+
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+            var result = query.AsNoTracking();
             return await result.FirstOrDefaultAsync();
         }
 
-        public async Task AddAsync(TEntity entity)
+        public virtual async Task AddAsync(TEntity entity)
         {
             using var db = DbContextFactory.CreateDbContext();
             if (entity == null)
@@ -60,6 +82,13 @@ namespace ELS.Persistence.Repositories
             }
 
             await db.Set<TEntity>().AddAsync(entity);
+            await db.SaveChangesAsync();
+        }
+
+        public virtual async Task UpdateAsync(TEntity entity)
+        {
+            using var db = DbContextFactory.CreateDbContext();
+            db.Set<TEntity>().Update(entity);
             await db.SaveChangesAsync();
         }
 

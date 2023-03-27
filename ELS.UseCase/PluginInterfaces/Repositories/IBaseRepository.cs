@@ -16,10 +16,19 @@ namespace ELS.UseCase.PluginInterfaces.Repositories
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null);
 
+        /// <summary>
+        /// Get entity as no tracking.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="includes"></param>
+        /// <returns></returns>
         Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> filter,
-        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null);
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null);
 
         Task AddAsync(TEntity entity);
+
+        Task UpdateAsync(TEntity entity);
     }
 }

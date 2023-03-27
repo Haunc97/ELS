@@ -1,0 +1,185 @@
+﻿@page "/editvocabulary/{VocbId:long}"
+@using System.ComponentModel.DataAnnotations;
+@using ELS.UseCase.Utils;
+@using ELS.WebApp.Controls;
+@inject NavigationManager NavigationManager;
+@inject IMediator Mediator
+
+<PageTitle>Edit Vocabulary</PageTitle>
+<h3>Edit Vocabulary</h3>
+
+<ToastComponent Show="showSuccessToast"
+                Title="Vocabulary"
+                Message="Update vocabulary successfully."
+                ToastDisplayToggled="@(() => showSuccessToast = false)">
+</ToastComponent>
+<br />
+@if(Model != null)
+{
+    <EditForm Model="Model" OnValidSubmit="SaveVocabulary">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group required">
+                    <label for="term">Term</label>
+                    <InputText id="term"
+                               placeholder="Enter English"
+                           @bind-Value="Model.Term"
+                               class="form-control">
+                    </InputText>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group required">
+                    <label for="def">Definition</label>
+                    <InputText id="def"
+                               placeholder="Vietnamese"
+                           @bind-Value="Model.Definition"
+                               class="form-control">
+                    </InputText>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="ipa">Phonetics</label>
+                    <InputText id="ipa"
+                               placeholder="IPA transcription"
+                           @bind-Value="Model.Phonetics"
+                               class="form-control">
+                    </InputText>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group required">
+                    <label for="class">Classification</label>
+                    <InputSelect id="class" @bind-Value="Model.Classification" class="form-control">
+                        <option value="0" selected>Select</option>
+                        @foreach (var wordType in Enum.GetValues(typeof(WordClassType)))
+                        {
+                            <option value="@((int)wordType)">@(((WordClassType)wordType).GetAttribute<DisplayAttribute>().Name)</option>
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group required">
+                    <label for="lv">Level</label>
+                    <InputSelect id="lv"
+                             @bind-Value="Model.Level"
+                                 class="form-control">
+                        <option value="0" selected>Select</option>
+                        @foreach (var vocLevel in Enum.GetValues(typeof(VocabularyLevel)))
+                        {
+                            <option value="@((int)vocLevel)">@vocLevel</option>
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="des">Description</label>
+                    <InputTextArea id="des"
+                                   rows="3"
+                                   placeholder="Enter description"
+                               @bind-Value="Model.Description"
+                                   class="form-control">
+                    </InputTextArea>
+                </div>
+            </div>
+        </div>
+        <br />
+
+        @*Form footer*@
+        <div class="d-flex justify-content-end">
+            <div class="btn-container">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public long VocbId { get; set; }
+    private EditVocabularyModel? Model { get; set; }
+    private bool showSuccessToast = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var vocb = await Mediator.Send(new Queries.Vocabularies.GetVocabularyById.GetVocabularyByIdQuery(VocbId));
+        if (vocb != null)
+        {
+            Model = new EditVocabularyModel()
+                {
+                    Term = vocb.Term,
+                    Definition = vocb.Definition,
+                    Classification = (int)vocb.Classification,
+                    Description = vocb.Description,
+                    Level = (int)vocb.Level,
+                    Phonetics = vocb.Phonetics
+                };
+        }
+    }
+
+    private async Task SaveVocabulary()
+    {
+        var model = new Commands.Vocabularies.AddVocabulary.AddVocabularyCommand(
+            Model.Term,
+            Model.Definition,
+            (WordClassType)Model.Classification,
+            (VocabularyLevel)Model.Level,
+            "System",
+            Model.Phonetics,
+            Model.Description);
+
+        var vocId = await Mediator.Send(model);
+
+        if (!showSuccessToast) showSuccessToast = true;
+
+        Model = new EditVocabularyModel();
+    }
+
+    void ToastDisplayToggled(bool show)
+    {
+        showSuccessToast = show;
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/vocabularies");
+    }
+
+    public class EditVocabularyModel
+    {
+        [Required]
+        [StringLength(128)]
+        public string Term { get; set; }
+
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "The Classification field is required.")]
+        public int Classification { get; set; }
+
+        [Required]
+        [StringLength(128)]
+        public string Definition { get; set; }
+
+        [StringLength(128)]
+        public string Phonetics { get; set; }
+
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "The Level field is required.")]
+        public int Level { get; set; }
+
+        [StringLength(512)]
+        public string Description { get; set; }
+    }
+}
