@@ -12,7 +12,7 @@
         <h2>List of Vocabularies</h2>
     </div>
     <div class="col-sm d-flex justify-content-end">
-        <button type="button" class="btn btn-primary" @onclick="AddVocabulary">Add Vocabulary</button>
+        <button type="button" class="btn btn-success" @onclick="AddVocabulary">Add Vocabulary</button>
     </div>
 </div>
 <br />
@@ -48,10 +48,23 @@
     </table>
 }
 
+
+<ToastComponent Show="showSuccessToast"
+                Title="Vocabulary"
+                Message="Delete vocabulary successfully."
+                ToastDisplayToggled="@(() => showSuccessToast = false)">
+</ToastComponent>
+
 @code {
     private List<Vocabulary> vocabularies = null;
+    private bool showSuccessToast = false;
 
     protected override async Task OnInitializedAsync()
+    {
+        await Search();
+    }
+
+    private async Task Search()
     {
         vocabularies = await Mediator.Send(new Queries.Vocabularies.SearchVocabularies.SearchVocabulariesQuery());
     }
@@ -66,8 +79,10 @@
         NavigationManager.NavigateTo($"/editvocabulary/{vocId}");
     }
 
-    private void DeleteVocabulary(long vocId)
+    private async Task DeleteVocabulary(long vocId)
     {
-        
+        await Mediator.Send(new Commands.Vocabularies.DeleteVocabulary.DeleteVocabularyCommand(vocId, "System"));
+        showSuccessToast = true;
+        await Search();
     }
 }

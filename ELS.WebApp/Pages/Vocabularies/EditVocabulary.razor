@@ -1,7 +1,6 @@
 ﻿@page "/editvocabulary/{VocbId:long}"
 @using System.ComponentModel.DataAnnotations;
 @using ELS.UseCase.Utils;
-@using ELS.WebApp.Controls;
 @inject NavigationManager NavigationManager;
 @inject IMediator Mediator
 
@@ -110,7 +109,7 @@
 @code {
     [Parameter]
     public long VocbId { get; set; }
-    private EditVocabularyModel? Model { get; set; }
+    private EditVocabularyModel Model { get; set; } = null;
     private bool showSuccessToast = false;
 
     protected override async Task OnParametersSetAsync()
@@ -132,7 +131,8 @@
 
     private async Task SaveVocabulary()
     {
-        var model = new Commands.Vocabularies.AddVocabulary.AddVocabularyCommand(
+        var model = new Commands.Vocabularies.EditVocabulary.EditVocabularyCommand(
+            VocbId,
             Model.Term,
             Model.Definition,
             (WordClassType)Model.Classification,
@@ -144,8 +144,6 @@
         var vocId = await Mediator.Send(model);
 
         if (!showSuccessToast) showSuccessToast = true;
-
-        Model = new EditVocabularyModel();
     }
 
     void ToastDisplayToggled(bool show)
