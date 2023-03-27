@@ -56,7 +56,7 @@ namespace ELS.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StudySets");
+                    b.ToTable("StudySets", (string)null);
                 });
 
             modelBuilder.Entity("ELS.Core.Entities.StudySetVocabulary", b =>
@@ -83,7 +83,7 @@ namespace ELS.Persistence.Migrations
 
                     b.HasIndex("VocabularyId");
 
-                    b.ToTable("StudySetVocabularies");
+                    b.ToTable("StudySetVocabularies", (string)null);
                 });
 
             modelBuilder.Entity("ELS.Core.Entities.Vocabulary", b =>
@@ -132,7 +132,7 @@ namespace ELS.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Vocabularies");
+                    b.ToTable("Vocabularies", (string)null);
                 });
 
             modelBuilder.Entity("ELS.Core.Entities.StudySetVocabulary", b =>

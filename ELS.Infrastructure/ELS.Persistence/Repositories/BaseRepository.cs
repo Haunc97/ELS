@@ -51,6 +51,18 @@ namespace ELS.Persistence.Repositories
             return await result.FirstOrDefaultAsync();
         }
 
+        public async Task AddAsync(TEntity entity)
+        {
+            using var db = DbContextFactory.CreateDbContext();
+            if (entity == null)
+            {
+                throw new InvalidOperationException("Unable to add a null entity to the repository.");
+            }
+
+            await db.Set<TEntity>().AddAsync(entity);
+            await db.SaveChangesAsync();
+        }
+
         #region protected
         protected virtual IQueryable<TEntity> GetQueryable()
         {

@@ -19,5 +19,7 @@ namespace ELS.UseCase.PluginInterfaces.Repositories
         Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> filter,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
         Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null);
+
+        Task AddAsync(TEntity entity);
     }
 }

@@ -1,34 +1,40 @@
 ﻿@page "/addvocabulary"
-@using ELS.Core.Entities;
 @using System.ComponentModel.DataAnnotations;
 @using ELS.UseCase.Utils;
+@using ELS.WebApp.Controls;
 @inject NavigationManager NavigationManager;
+@inject IMediator Mediator
 
 <PageTitle>Add Vocabulary</PageTitle>
 
 <h3>Add Vocabulary</h3>
+<ToastComponent Show="showSuccessToast"
+                Title="Vocabulary"
+                Message="Add vocabulary successfully."
+                ToastDisplayToggled="@(() => showSuccessToast = false)">
+</ToastComponent>
 <br />
-<EditForm Model="Vocabulary" OnValidSubmit="SaveVocabulary">
+<EditForm Model="Model" OnValidSubmit="SaveVocabulary">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
 
     <div class="row">
         <div class="col-6">
-            <div class="form-group">
+            <div class="form-group required">
                 <label for="term">Term</label>
                 <InputText id="term"
                            placeholder="Enter English"
-                           @bind-Value="Vocabulary.Term"
+                           @bind-Value="Model.Term"
                            class="form-control">
                 </InputText>
             </div>
         </div>
         <div class="col-6">
-            <div class="form-group">
+            <div class="form-group required">
                 <label for="def">Definition</label>
                 <InputText id="def"
                            placeholder="Vietnamese"
-                           @bind-Value="Vocabulary.Definition"
+                           @bind-Value="Model.Definition"
                            class="form-control">
                 </InputText>
             </div>
@@ -41,18 +47,19 @@
                 <label for="ipa">Phonetics</label>
                 <InputText id="ipa"
                            placeholder="IPA transcription"
-                           @bind-Value="Vocabulary.Phonetics"
+                           @bind-Value="Model.Phonetics"
                            class="form-control">
                 </InputText>
             </div>
         </div>
         <div class="col-6">
-            <div class="form-group">
+            <div class="form-group required">
                 <label for="class">Classification</label>
-                <InputSelect id="class" @bind-Value="Vocabulary.Classification" class="form-control">
+                <InputSelect id="class" @bind-Value="Model.Classification" class="form-control">
+                    <option value="0" selected>Select</option>
                     @foreach (var wordType in Enum.GetValues(typeof(WordClassType)))
                     {
-                        <option value="@wordType">@(((WordClassType)wordType).GetAttribute<DisplayAttribute>().Name)</option>
+                        <option value="@((int)wordType)">@(((WordClassType)wordType).GetAttribute<DisplayAttribute>().Name)</option>
                     }
                 </InputSelect>
             </div>
@@ -61,14 +68,15 @@
     <br />
     <div class="row">
         <div class="col-6">
-            <div class="form-group">
+            <div class="form-group required">
                 <label for="lv">Level</label>
                 <InputSelect id="lv"
-                             @bind-Value="Vocabulary.Level"
+                             @bind-Value="Model.Level"
                              class="form-control">
+                    <option value="0" selected>Select</option>
                     @foreach (var vocLevel in Enum.GetValues(typeof(VocabularyLevel)))
                     {
-                        <option value="@vocLevel">@vocLevel</option>
+                        <option value="@((int)vocLevel)">@vocLevel</option>
                     }
                 </InputSelect>
             </div>
@@ -79,7 +87,7 @@
                 <InputTextArea id="des"
                                rows="3"
                                placeholder="Enter description"
-                               @bind-Value="Vocabulary.Description"
+                               @bind-Value="Model.Description"
                                class="form-control">
                 </InputTextArea>
             </div>
@@ -97,16 +105,59 @@
 </EditForm>
 
 @code {
-    private Vocabulary Vocabulary { get; set; } = new Vocabulary();
-
+    private AddVocabularyModel Model { get; set; } = new AddVocabularyModel();
+    private bool showSuccessToast = false;
 
     private async Task SaveVocabulary()
     {
+        var model = new Commands.Vocabularies.AddVocabulary.AddVocabularyCommand(
+            Model.Term,
+            Model.Definition,
+            (WordClassType)Model.Classification,
+            (VocabularyLevel)Model.Level,
+            "System",
+            Model.Phonetics,
+            Model.Description);
 
+        var vocId = await Mediator.Send(model);
+
+        if (!showSuccessToast) showSuccessToast = true;
+
+        Model = new AddVocabularyModel();
+    }
+
+    void ToastDisplayToggled(bool show)
+    {
+        showSuccessToast = show;
     }
 
     private void Cancel()
     {
         NavigationManager.NavigateTo("/vocabularies");
+    }
+
+    public class AddVocabularyModel
+    {
+        [Required]
+        [StringLength(128)]
+        public string Term { get; set; }
+
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "The Classification field is required.")]
+        public int Classification { get; set; }
+
+        [Required]
+        [StringLength(128)]
+        public string Definition { get; set; }
+
+        [StringLength(128)]
+        public string Phonetics { get; set; }
+
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "The Level field is required.")]
+        public int Level { get; set; }
+
+        [StringLength(512)]
+        public string Description { get; set; }
     }
 }

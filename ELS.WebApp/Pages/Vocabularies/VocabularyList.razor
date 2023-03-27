@@ -1,8 +1,5 @@
 ﻿@page "/vocabularies"
-@using ELS.Core.Entities;
-@using ELS.UseCase.Queries.Vocabularies.SearchVocabularies;
 @using ELS.UseCase.Utils;
-@using MediatR;
 @using System.ComponentModel.DataAnnotations;
 @inject NavigationManager NavigationManager;
 
@@ -56,7 +53,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        vocabularies = await Mediator.Send(new SearchVocabulariesQuery());
+        vocabularies = await Mediator.Send(new Queries.Vocabularies.SearchVocabularies.SearchVocabulariesQuery());
     }
 
     private void AddVocabulary()
@@ -71,6 +68,6 @@
 
     private void DeleteVocabulary(long vocId)
     {
-        NavigationManager.NavigateTo($"/editvocabulary/{vocId}");
+        
     }
 }

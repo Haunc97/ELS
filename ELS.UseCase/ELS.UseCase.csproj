@@ -15,8 +15,4 @@
     <ProjectReference Include="..\ELS.Core\ELS.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Commands\Vocabularies\" />
-  </ItemGroup>
-
 </Project>

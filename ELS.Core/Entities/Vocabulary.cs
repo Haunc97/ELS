@@ -6,8 +6,6 @@ namespace ELS.Core.Entities
     public class Vocabulary : Entity
     {
         public long Id { get; set; }
-
-        [Required]
         public string Term { get; set; }
         public WordClassType Classification { get; set; }
         public string Definition { get; set; }
@@ -16,6 +14,7 @@ namespace ELS.Core.Entities
         public string Description { get; set; }
         public string Example { get; set; }
         public bool Status { get; set; }
+
         public ICollection<StudySetVocabulary> StudySetVocabularies { get; set; }
     }
 }
