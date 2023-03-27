@@ -1,0 +1,76 @@
+﻿@page "/vocabularies"
+@using ELS.Core.Entities;
+@using ELS.UseCase.Queries.Vocabularies.SearchVocabularies;
+@using ELS.UseCase.Utils;
+@using MediatR;
+@using System.ComponentModel.DataAnnotations;
+@inject NavigationManager NavigationManager;
+
+@inject IMediator Mediator
+
+<PageTitle>List of Vocabularies</PageTitle>
+
+<div class="row">
+    <div class="col-sm">
+        <h2>List of Vocabularies</h2>
+    </div>
+    <div class="col-sm d-flex justify-content-end">
+        <button type="button" class="btn btn-primary" @onclick="AddVocabulary">Add Vocabulary</button>
+    </div>
+</div>
+<br />
+@if (vocabularies != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Term</th>
+                <th>Definition</th>
+                <th>Phonetics</th>
+                <th>Classification</th>
+                <th>Level</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in vocabularies)
+            {
+                <tr id="@item.Id">
+                    <td>@item.Term</td>
+                    <td>@item.Definition</td>
+                    <td>@item.Phonetics</td>
+                    <td>@(item.Classification.GetAttribute<DisplayAttribute>().Name)</td>
+                    <td>@item.Level</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => EditVocabulary(item.Id))">Edit</button>
+                        <button type="button" class="btn btn-sm btn-danger" @onclick="@(() => DeleteVocabulary(item.Id))">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Vocabulary> vocabularies = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        vocabularies = await Mediator.Send(new SearchVocabulariesQuery());
+    }
+
+    private void AddVocabulary()
+    {
+        NavigationManager.NavigateTo("/addvocabulary");
+    }
+
+    private void EditVocabulary(long vocId)
+    {
+        NavigationManager.NavigateTo($"/editvocabulary/{vocId}");
+    }
+
+    private void DeleteVocabulary(long vocId)
+    {
+        NavigationManager.NavigateTo($"/editvocabulary/{vocId}");
+    }
+}

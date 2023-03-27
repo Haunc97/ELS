@@ -1,0 +1,112 @@
+﻿@page "/addvocabulary"
+@using ELS.Core.Entities;
+@using System.ComponentModel.DataAnnotations;
+@using ELS.UseCase.Utils;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Add Vocabulary</PageTitle>
+
+<h3>Add Vocabulary</h3>
+<br />
+<EditForm Model="Vocabulary" OnValidSubmit="SaveVocabulary">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label for="term">Term</label>
+                <InputText id="term"
+                           placeholder="Enter English"
+                           @bind-Value="Vocabulary.Term"
+                           class="form-control">
+                </InputText>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label for="def">Definition</label>
+                <InputText id="def"
+                           placeholder="Vietnamese"
+                           @bind-Value="Vocabulary.Definition"
+                           class="form-control">
+                </InputText>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label for="ipa">Phonetics</label>
+                <InputText id="ipa"
+                           placeholder="IPA transcription"
+                           @bind-Value="Vocabulary.Phonetics"
+                           class="form-control">
+                </InputText>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label for="class">Classification</label>
+                <InputSelect id="class" @bind-Value="Vocabulary.Classification" class="form-control">
+                    @foreach (var wordType in Enum.GetValues(typeof(WordClassType)))
+                    {
+                        <option value="@wordType">@(((WordClassType)wordType).GetAttribute<DisplayAttribute>().Name)</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                <label for="lv">Level</label>
+                <InputSelect id="lv"
+                             @bind-Value="Vocabulary.Level"
+                             class="form-control">
+                    @foreach (var vocLevel in Enum.GetValues(typeof(VocabularyLevel)))
+                    {
+                        <option value="@vocLevel">@vocLevel</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label for="des">Description</label>
+                <InputTextArea id="des"
+                               rows="3"
+                               placeholder="Enter description"
+                               @bind-Value="Vocabulary.Description"
+                               class="form-control">
+                </InputTextArea>
+            </div>
+        </div>
+    </div>
+    <br />
+
+    @*Form footer*@
+    <div class="d-flex justify-content-end">
+        <div class="btn-container">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private Vocabulary Vocabulary { get; set; } = new Vocabulary();
+
+
+    private async Task SaveVocabulary()
+    {
+
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/vocabularies");
+    }
+}
