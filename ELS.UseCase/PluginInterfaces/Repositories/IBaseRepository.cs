@@ -30,5 +30,18 @@ namespace ELS.UseCase.PluginInterfaces.Repositories
         Task AddAsync(TEntity entity);
 
         Task UpdateAsync(TEntity entity);
+
+        /// <summary>
+        /// To add new entities to database context
+        /// </summary>
+        /// <param name="entities">Array of entity to add</param>
+        /// <returns>Task</returns>
+        Task AddRangeAsync(TEntity[] entities);
+
+        /// <summary>
+        /// To update entities in database context
+        /// </summary>
+        /// <param name="entities"></param>
+        Task RemoveRangeAsync(TEntity[] entities);
     }
 }

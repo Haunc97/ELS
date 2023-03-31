@@ -19,7 +19,8 @@ namespace ELS.UseCase.Queries.Vocabularies.SearchVocabularies
                                             (string.IsNullOrWhiteSpace(request.Term) || x.Term.ToLower().IndexOf(request.Term.ToLower()) >= 0) &&
                                             (string.IsNullOrWhiteSpace(request.Definition) || x.Definition.ToLower().IndexOf(request.Definition.ToLower()) >= 0) &&
                                             (!request.Level.HasValue || x.Level == request.Level) &&
-                                            (!request.Classification.HasValue || x.Classification == request.Classification));
+                                            (!request.Classification.HasValue || x.Classification == request.Classification),
+                                            orderBy: y => y.OrderBy(x => x.Term));
         }
     }
 }

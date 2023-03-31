@@ -25,6 +25,7 @@ builder.Services.AddMediatR(typeof(SearchVocabulariesQuery));
 
 builder.Services.AddTransient<IVocabularyRepository, VocabularyRepository>();
 builder.Services.AddTransient<IStudySetRepository, StudySetRepository>();
+builder.Services.AddTransient<IStudySetVocabularyRepository, StudySetVocabularyRepository>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();

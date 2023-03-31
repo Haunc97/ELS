@@ -85,10 +85,37 @@ namespace ELS.Persistence.Repositories
             await db.SaveChangesAsync();
         }
 
+        public async Task AddRangeAsync(TEntity[] entities)
+        {
+            if (entities == null)
+            {
+                throw new InvalidOperationException("Unable to add a null entities to the repository.");
+            }
+
+            using var db = DbContextFactory.CreateDbContext();
+
+            db.ChangeTracker.AutoDetectChangesEnabled = false;
+            await db.Set<TEntity>().AddRangeAsync(entities);
+            db.ChangeTracker.AutoDetectChangesEnabled = true;
+
+            await db.SaveChangesAsync();
+        }
+
         public virtual async Task UpdateAsync(TEntity entity)
         {
             using var db = DbContextFactory.CreateDbContext();
             db.Set<TEntity>().Update(entity);
+            await db.SaveChangesAsync();
+        }
+
+        public virtual async Task RemoveRangeAsync(TEntity[] entities)
+        {
+            if (entities == null)
+            {
+                throw new InvalidOperationException("Unable to remove a null entities.");
+            }
+            using var db = DbContextFactory.CreateDbContext();
+            db.Set<TEntity>().RemoveRange(entities);
             await db.SaveChangesAsync();
         }
 

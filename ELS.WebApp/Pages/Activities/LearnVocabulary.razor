@@ -1,88 +1,47 @@
 ﻿@page "/learn"
+@using Azure.Core;
+@using System.Web;
+@using static ELS.WebApp.Controls.LearnCardComponent;
 @inject IMediator Mediator
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavManager
 
 <h3>Learn Vocabulary</h3>
 <br />
-@if (vocabularies != null && vocabularies.Any())
-{
-    <div class="carousel slide" data-ride="carousel" style="width: 70%; margin: 0 auto !important;">
-        <div class="carousel-inner">
-            @for (int i = 0; i < vocabularies.Count; i++)
-            {
-                <div class="@GetItemStyleClass(i)" style="position: relative">
-                    <img src="@randomBg" class="d-block w-100">
-                    <p @onclick="ToggleResult" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2em; color: white; font-weight: bold; cursor: pointer">
-                        @if (!showResult)
-                        {
-                            @vocabularies.ElementAt(i).Definition
-                        }
-                        else
-                        {
-                            @vocabularies.ElementAt(i).Term
-                        }
-                    </p>
-                </div>
-            }
-        </div>
-        <button class="carousel-control-prev" type="button" data-target="#carouselExampleControls" data-slide="prev" @onclick="GoPrevious">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="sr-only">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-target="#carouselExampleControls" data-slide="next" @onclick="GoNext">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="sr-only">Next</span>
-        </button>
-    </div>
-}
+<LearnCardComponent SearchingFunc="SearchVocabularies" GoDetailFunc="NavigateToVocDetail" BgImgs="bgImgs"></LearnCardComponent>
 
 @code {
-    private string[] bgImgs = { "learn-bg.jpg", "learn-bg-1.jpg", "learn-bg-2.jpg" };
-    private string randomBg = "";
-    private List<Vocabulary> vocabularies;
-    private int current = 0;
-    private bool showResult = false;
+    public string[] bgImgs = { "/imgs/learn-bg.jpg", "/imgs/learn-bg-1.jpg", "/imgs/learn-bg-2.jpg" };
+    private long? stdSetId = null;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        randomBg = GetRandomBg();
-        vocabularies = await Mediator.Send(new Queries.Vocabularies.SearchVocabularies.SearchVocabulariesQuery());
+        var query = NavManager.ToAbsoluteUri(NavManager.Uri).Query;
+        var queryParams = System.Web.HttpUtility.ParseQueryString(query);
+        if (long.TryParse(queryParams["stdSetId"], out long id))
+        {
+            stdSetId = id;
+        }
     }
 
-    private void ToggleResult()
+    private async Task<List<LearnCardItem>> SearchVocabularies()
     {
-        if (showResult)
+        List<Vocabulary> vocs = null;
+
+        if (stdSetId.HasValue)
         {
-            GoNext();
+            vocs = await Mediator.Send(new Queries.Vocabularies.GetVocabulariesByStudySet.GetVocabulariesByStudySetQuery(stdSetId.Value));
         }
         else
         {
-            showResult = true;
+            vocs = await Mediator.Send(new Queries.Vocabularies.SearchVocabularies.SearchVocabulariesQuery());
         }
+
+        return vocs?.Select(x => new LearnCardItem(x.Id, x.Definition, x.Term)).ToList();
     }
 
-    private string GetItemStyleClass(int classIndex)
+    private void NavigateToVocDetail(long id)
     {
-        return classIndex == current ? "carousel-item active" : "carousel-item";
-    }
-
-    private string GetRandomBg()
-    {
-        Random rnd = new();
-        int randomIndex = rnd.Next(bgImgs.Length);
-        return "/" + bgImgs[randomIndex];
-    }
-
-    private void GoNext()
-    {
-        if (current == vocabularies.Count - 1) return;
-        current += 1;
-        showResult = false;
-    }
-
-    private void GoPrevious()
-    {
-        if (current == 0) return;
-        current -= 1;
-        showResult = false;
+        NavManager.NavigateTo($"/editvocabulary/{id}");
     }
 }

@@ -1,0 +1,161 @@
+﻿@page "/addstudyset"
+@using System.ComponentModel.DataAnnotations;
+@using ELS.UseCase.Utils;
+@using static ELS.WebApp.Controls.AutoCompleteComponent;
+@inject NavigationManager NavigationManager;
+@inject IMediator Mediator
+
+<PageTitle>Add Study Set</PageTitle>
+
+<h3>Add Study Set</h3>
+<ToastComponent Show="showSuccessToast"
+                Title="Study Set"
+                Message="Add study set successfully."
+                ToastDisplayToggled="@(() => showSuccessToast = false)">
+</ToastComponent>
+<br />
+<EditForm Model="Model" OnValidSubmit="SaveStudySet">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group required">
+                <label for="titile">Title</label>
+                <InputText id="titile"
+                           placeholder="Enter title"
+                           @bind-Value="Model.Title"
+                           class="form-control">
+                </InputText>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                <label for="des">Description</label>
+                <InputTextArea id="des"
+                               rows="3"
+                               placeholder="Enter description"
+                               @bind-Value="Model.Description"
+                               class="form-control">
+                </InputTextArea>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <AutoCompleteComponent Label="Vocabularies" SearchFunction="SearchVocabulary" OnItemSelected="OnVocabularySelected"></AutoCompleteComponent>
+                    @if (Model.Vocabularies.Any())
+                    {
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td>Term</td>
+                                    <td>Definition</td>
+                                    <td>Classification</td>
+                                    <td>Action</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Vocabularies)
+                                {
+                                    <tr>
+                                        <th>@item.Term</th>
+                                        <th>@item.Definition</th>
+                                        <td>@(item.Classification.GetAttribute<DisplayAttribute>().Name)</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-danger" @onclick="@(() => DeleteVocabulary(item))">Remove</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+
+    @*Form footer*@
+    <div class="d-flex justify-content-end">
+        <div class="btn-container">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private AddStudySetModel Model { get; set; } = new AddStudySetModel();
+    private bool showSuccessToast = false;
+
+    private async Task SaveStudySet()
+    {
+        var model = new Commands.StudySets.AddStudySet.AddStudySetCommand(
+            Model.Title,
+            "System",
+            Model.Vocabularies,
+            Model.Description);
+
+        var stdSetId = await Mediator.Send(model);
+
+        if (!showSuccessToast) showSuccessToast = true;
+
+        Model = new AddStudySetModel();
+    }
+
+    private void DeleteVocabulary(Vocabulary voc)
+    {
+        Model.Vocabularies.Remove(voc);
+    }
+
+    private async Task<List<ItemViewModel>?> SearchVocabulary(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return null;
+
+        var vocb = await Mediator.Send(new Queries.Vocabularies.SearchVocabularies.SearchVocabulariesQuery
+            {
+                Term = name
+            });
+
+        return vocb.Select(x => new ItemViewModel
+            {
+                Id = x.Id,
+                Name = x.Term
+            }).ToList();
+    }
+
+    private async Task OnVocabularySelected(ItemViewModel item)
+    {
+        if (!Model.Vocabularies.Any(x => x.Id == item.Id))
+        {
+            var vocb = await Mediator.Send(new Queries.Vocabularies.GetVocabularyById.GetVocabularyByIdQuery(item.Id));
+            Model.Vocabularies.Add(vocb);
+        }
+    }
+
+    void ToastDisplayToggled(bool show)
+    {
+        showSuccessToast = show;
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/studysets");
+    }
+
+    public class AddStudySetModel
+    {
+        [Required]
+        [StringLength(52)]
+        public string Title { get; set; }
+
+        [StringLength(128)]
+        public string Description { get; set; }
+
+        public List<Vocabulary> Vocabularies { get; set; } = new List<Vocabulary>();
+    }
+}

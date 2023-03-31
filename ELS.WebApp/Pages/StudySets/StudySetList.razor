@@ -1,0 +1,90 @@
+﻿@page "/studysets"
+@using ELS.UseCase.Utils;
+@using System.ComponentModel.DataAnnotations;
+@inject NavigationManager NavigationManager;
+
+@inject IMediator Mediator
+
+<PageTitle>List of Study Sets</PageTitle>
+
+<div class="row">
+    <div class="col-sm">
+        <h2>List of Study Sets</h2>
+    </div>
+    <div class="col-sm d-flex justify-content-end">
+        <button type="button" class="btn btn-success" @onclick="AddStudySet">New set</button>
+    </div>
+</div>
+<br />
+@if (studySets != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Vocabulary Total</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in studySets)
+            {
+                <tr id="@item.Id">
+                    <td>@item.Title</td>
+                    <td>@item.Description</td>
+                    <td>@(item.StudySetVocabularies?.Count(x => x.Vocabulary.Status) ?? 0) Vocabularies</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => LearnStudySet(item.Id))">Learn</button>
+                        <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => EditStudySet(item.Id))">Edit</button>
+                        <button type="button" class="btn btn-sm btn-danger" @onclick="@(() => DeleteStudySet(item.Id))">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+<ToastComponent Show="showSuccessToast"
+                Title="Study Set"
+                Message="Delete study set successfully."
+                ToastDisplayToggled="@(() => showSuccessToast = false)">
+</ToastComponent>
+
+@code {
+    private List<StudySet> studySets = null;
+    private bool showSuccessToast = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Search();
+    }
+
+    private async Task Search()
+    {
+        studySets = await Mediator.Send(new Queries.StudySets.SearchStudySets.SearchStudySetsQuery());
+    }
+
+    private void AddStudySet()
+    {
+        NavigationManager.NavigateTo("/addstudyset");
+    }
+
+    private void EditStudySet(long stdSetId)
+    {
+        NavigationManager.NavigateTo($"/editstudyset/{stdSetId}");
+    }
+
+    private void LearnStudySet(long stdSetId)
+    {
+        NavigationManager.NavigateTo($"/learn?stdSetId={stdSetId}");
+    }
+
+    private async Task DeleteStudySet(long stdSetId)
+    {
+        await Mediator.Send(new Commands.StudySets.DeleteStudySet.DeleteStudySetCommand(stdSetId, "System"));
+        showSuccessToast = true;
+        await Search();
+    }
+}
