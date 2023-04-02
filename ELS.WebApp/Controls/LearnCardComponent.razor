@@ -7,19 +7,20 @@
             @for (int i = 0; i < learnItems.Count; i++)
             {
                 <div class="@GetItemStyleClass(i)" style="position: relative">
-                    <img src="@randomBg" class="d-block w-100">
-                    <p id="vocabulary" @onclick="ToggleResult" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2em; color: white; font-weight: bold; cursor: pointer">
+                    <img src="@randomBg" class="d-block w-100 card-bg">
+                    <div id="vocabulary" @onclick="ToggleResult" class="card-content">
                         @if (!showResult)
                         {
-                            @learnItems.ElementAt(i).Term
+                            <p style="font-size: 2em;" class="font-weight-bold">@learnItems.ElementAt(i).Term</p>
                         }
                         else
                         {
-                            @learnItems.ElementAt(i).Result
+                            <p style="font-size: 2em" class="font-weight-bold">@learnItems.ElementAt(i).Result</p>
+                            <p>@learnItems.ElementAt(i).Description</p>
                         }
-                    </p>
+                    </div>
                     <div class="carousel-caption d-none d-md-block">
-                        <h5>@(current + 1) of @learnItems.Count</h5>
+                        <p>@(current + 1) of @learnItems.Count</p>
                     </div>
                 </div>
             }
@@ -98,5 +99,5 @@
         showResult = false;
     }
 
-    public record LearnCardItem(long Id, string Term, string Result);
+    public record LearnCardItem(string Term, string Result, string Description = "");
 }

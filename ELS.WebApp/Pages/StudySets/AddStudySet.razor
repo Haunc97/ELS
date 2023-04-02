@@ -46,7 +46,7 @@
         <div class="col">
             <div class="card">
                 <div class="card-body">
-                    <AutoCompleteComponent Label="Vocabularies" SearchFunction="SearchVocabulary" OnItemSelected="OnVocabularySelected"></AutoCompleteComponent>
+                    <AutoCompleteComponent Label="@("Vocabularies (" + (Model.Vocabularies?.Count ?? 0) + ")")" SearchFunction="SearchVocabulary" OnItemSelected="OnVocabularySelected"></AutoCompleteComponent>
                     @if (Model.Vocabularies.Any())
                     {
                         <table class="table">

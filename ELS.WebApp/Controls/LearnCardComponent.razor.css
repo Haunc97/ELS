@@ -2,3 +2,13 @@
     width: 68%;
     margin: 0 auto !important;
 }
+
+.card-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    cursor: pointer;
+    text-align: center
+}

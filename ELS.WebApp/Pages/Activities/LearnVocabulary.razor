@@ -37,7 +37,7 @@
             vocs = await Mediator.Send(new Queries.Vocabularies.SearchVocabularies.SearchVocabulariesQuery());
         }
 
-        return vocs?.Select(x => new LearnCardItem(x.Id, x.Definition, x.Term)).ToList();
+        return vocs?.Select(x => new LearnCardItem(x.Definition, x.Term, x.Phonetics)).ToList();
     }
 
     private void NavigateToVocDetail(long id)
