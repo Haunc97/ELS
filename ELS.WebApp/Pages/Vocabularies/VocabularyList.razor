@@ -1,8 +1,9 @@
 ﻿@page "/vocabularies"
 @using ELS.UseCase.Utils;
 @using System.ComponentModel.DataAnnotations;
-@inject NavigationManager NavigationManager;
+@using static ELS.WebApp.Controls.Vocabularies.SearchVocabulariesComponent;
 
+@inject NavigationManager NavigationManager;
 @inject IMediator Mediator
 
 <PageTitle>List of Vocabularies</PageTitle>
@@ -18,6 +19,8 @@
         </div>
     </div>
 </div>
+<br />
+<SearchVocabulariesComponent OnSearch="OnSearchVocabularies"></SearchVocabulariesComponent>
 <br />
 @if (vocabularies != null)
 {
@@ -64,12 +67,21 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await Search();
+        await SearchVocabularies();
     }
 
-    private async Task Search()
+    private async Task SearchVocabularies(string term = "", WordClassType? classification = null, VocabularyLevel? level = null)
     {
-        vocabularies = await Mediator.Send(new Queries.Vocabularies.SearchVocabularies.SearchVocabulariesQuery());
+        var request = new Queries.Vocabularies.SearchVocabularies.SearchVocabulariesQuery(
+            Term: term,
+            Classification: classification,
+            Level: level);
+        vocabularies = await Mediator.Send(request);
+    }
+
+    private async Task OnSearchVocabularies(SearchVocabularyForm searchFrm)
+    {
+        await SearchVocabularies(searchFrm.Term, searchFrm.Classification, searchFrm.Level);
     }
 
     private void AddVocabulary()
@@ -91,6 +103,6 @@
     {
         await Mediator.Send(new Commands.Vocabularies.DeleteVocabulary.DeleteVocabularyCommand(vocId, "System"));
         showSuccessToast = true;
-        await Search();
+        await SearchVocabularies();
     }
 }
