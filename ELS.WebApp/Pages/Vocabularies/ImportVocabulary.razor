@@ -1,0 +1,45 @@
+﻿@page "/importvocabularies"
+@using Microsoft.AspNetCore.Mvc;
+@inject IMediator Mediator
+
+<h3>Import Vocabulary</h3>
+
+<InputFile OnChange="HandleSelection" />
+<br />
+<div class="mt-4">
+    <button type="button"
+            class="btn btn-primary"
+            disabled="@(selectedFile == null)"
+            @onclick="Import">
+        Import
+    </button>
+</div>
+
+@code {
+    private IBrowserFile selectedFile = null;
+    private readonly List<string> allowFileExtensions = new List<string> { ".xlsx" };
+
+    private void HandleSelection(InputFileChangeEventArgs e)
+    {
+        var files = e.GetMultipleFiles();
+        this.selectedFile = files[0];
+    }
+
+    private async Task Import()
+    {
+        if (selectedFile == null) return;
+
+        var ms = new MemoryStream();
+        await selectedFile.OpenReadStream().CopyToAsync(ms);
+
+        string extension = Path.GetExtension(selectedFile.Name);
+
+        if (!allowFileExtensions.Contains(extension))
+        {
+            throw new InvalidDataException();
+        }
+
+        var byteArray = ms.ToArray();
+        await Mediator.Send(new Commands.Vocabularies.ImportVocabulary.ImportVocabularyCommand(byteArray, "System"));
+    }
+}

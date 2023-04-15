@@ -27,19 +27,19 @@
     <table class="table">
         <thead>
             <tr>
-                <th width="300">Term</th>
-                <th width="300">Definition</th>
-                <th>Phonetics</th>
-                <th>Classification</th>
-                <th>Level</th>
-                <th>Action</th>
+                <th width="22%">Term</th>
+                <th width="22%">Definition</th>
+                <th width="18%">Phonetics</th>
+                <th width="13%">Classification</th>
+                <th width="12%">Level</th>
+                <th width="13%">Action</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in vocabularies)
             {
                 <tr id="@item.Id">
-                    <td width="300">@item.Term</td>
+                    <td width="300"><a style="cursor: pointer" @onclick="@(() => ViewVocabulary(item))">@item.Term</a></td>
                     <td width="300">@item.Definition</td>
                     <td>@item.Phonetics</td>
                     <td>@(item.Classification.GetAttribute<DisplayAttribute>().Name)</td>
@@ -53,7 +53,10 @@
         </tbody>
     </table>
 }
-
+<ViewVocabularyComponent IsDisplay="showVocabularyDetail"
+                         Vocabulary="selectedVocabulary"
+                         OnToggleDisplay="OnToggleViewDisplay">
+</ViewVocabularyComponent>
 
 <ToastComponent Show="showSuccessToast"
                 Title="Vocabulary"
@@ -64,6 +67,8 @@
 @code {
     private List<Vocabulary> vocabularies = null;
     private bool showSuccessToast = false;
+    private bool showVocabularyDetail = false;
+    private Vocabulary? selectedVocabulary = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -82,6 +87,17 @@
     private async Task OnSearchVocabularies(SearchVocabularyForm searchFrm)
     {
         await SearchVocabularies(searchFrm.Term, searchFrm.Classification, searchFrm.Level);
+    }
+
+    private void OnToggleViewDisplay(bool value)
+    {
+        this.showVocabularyDetail = value;
+    }
+
+    private void ViewVocabulary(Vocabulary voc)
+    {
+        this.selectedVocabulary = voc;
+        showVocabularyDetail = true;
     }
 
     private void AddVocabulary()

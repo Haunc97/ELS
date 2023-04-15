@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ELS.Excel\ELS.Excel.csproj" />
     <ProjectReference Include="..\ELS.Infrastructure\ELS.Persistence\ELS.Persistence.csproj" />
   </ItemGroup>
 

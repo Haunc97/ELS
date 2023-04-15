@@ -81,12 +81,28 @@
             </div>
         </div>
         <div class="col-lg-6">
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-lg-6">
             <div class="form-group">
                 <label for="des">Description</label>
                 <InputTextArea id="des"
-                               rows="5"
+                               rows="4"
                                placeholder="Enter description"
                                @bind-Value="Model.Description"
+                               class="form-control">
+                </InputTextArea>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label for="ex">Example</label>
+                <InputTextArea id="ex"
+                               rows="4"
+                               placeholder="Enter examples"
+                               @bind-Value="Model.Example"
                                class="form-control">
                 </InputTextArea>
             </div>
@@ -116,7 +132,8 @@
             (VocabularyLevel)Model.Level,
             "System",
             Model.Phonetics,
-            Model.Description);
+            Model.Description,
+            Model.Example);
 
         var vocId = await Mediator.Send(model);
 
@@ -158,5 +175,8 @@
 
         [StringLength(512)]
         public string Description { get; set; }
+
+        [StringLength(512)]
+        public string Example { get; set; }
     }
 }

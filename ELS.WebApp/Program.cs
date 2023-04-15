@@ -1,12 +1,16 @@
+using ELS.Excel;
 using ELS.Persistence;
 using ELS.Persistence.Contexts;
 using ELS.Persistence.Repositories;
 using ELS.UseCase.PluginInterfaces;
+using ELS.UseCase.PluginInterfaces.Common;
 using ELS.UseCase.PluginInterfaces.Repositories;
 using ELS.UseCase.Queries.Vocabularies.SearchVocabularies;
 using ELS.WebApp.Data;
 using MediatR;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +30,12 @@ builder.Services.AddMediatR(typeof(SearchVocabulariesQuery));
 builder.Services.AddTransient<IVocabularyRepository, VocabularyRepository>();
 builder.Services.AddTransient<IStudySetRepository, StudySetRepository>();
 builder.Services.AddTransient<IStudySetVocabularyRepository, StudySetVocabularyRepository>();
+builder.Services.AddTransient<IExcelReader, ExcelReader>();
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 60000000000000000; // 600 MB
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();

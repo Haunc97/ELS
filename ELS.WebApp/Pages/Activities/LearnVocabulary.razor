@@ -7,20 +7,26 @@
 @inject NavigationManager NavManager
 
 <h3>Learn Vocabulary</h3>
+@if(stdSet != null)
+{
+    <p class="topic-title">Topic: <a href="editstudyset/@stdSet.Id">@stdSet.Title</a></p>
+}
 <br />
 <LearnCardComponent SearchingFunc="SearchVocabularies" GoDetailFunc="NavigateToVocDetail" BgImgs="bgImgs"></LearnCardComponent>
 
 @code {
     public string[] bgImgs = { "/imgs/learn-bg.jpg", "/imgs/learn-bg-1.jpg", "/imgs/learn-bg-2.jpg" };
     private long? stdSetId = null;
+    private StudySet stdSet = null;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         var query = NavManager.ToAbsoluteUri(NavManager.Uri).Query;
         var queryParams = System.Web.HttpUtility.ParseQueryString(query);
         if (long.TryParse(queryParams["stdSetId"], out long id))
         {
             stdSetId = id;
+            stdSet = await Mediator.Send(new Queries.StudySets.GetStudySetById.GetStudySetByIdQuery(stdSetId.Value));
         }
     }
 
@@ -34,11 +40,57 @@
         }
         else
         {
-            vocs = await Mediator.Send(new Queries.Vocabularies.SearchVocabularies.SearchVocabulariesQuery());
+            var allVocs = await Mediator.Send(new Queries.Vocabularies.SearchVocabularies.SearchVocabulariesQuery());
+
+            //replicateByLevel(allVocs);
+            GetRandomVocabularies(allVocs, out vocs);
         }
 
         return vocs?.Select(x => new LearnCardItem(x.Definition, x.Term, x.Phonetics)).ToList();
     }
+
+    private void GetRandomVocabularies(List<Vocabulary> vocbs, out List<Vocabulary> rndVocbs, int qty = 10)
+    {
+        rndVocbs = new List<Vocabulary>();
+
+        if (vocbs == null || !vocbs.Any()) return;
+
+        if (vocbs.Count > qty)
+        {
+            var rnd = new Random();
+
+            int i = 0;
+            while (i < qty)
+            {
+                var rndMember = vocbs[rnd.Next(vocbs.Count)];
+                if (!rndVocbs.Contains(rndMember))
+                {
+                    rndVocbs.Add(rndMember);
+                    i++;
+                }
+            }
+        }
+        else
+        {
+            rndVocbs.AddRange(vocbs);
+        }
+
+    }
+
+    //private void replicateByLevel(List<Vocabulary> vocbs)
+    //{
+    //    int i = vocbs.Count() - 1;
+    //    while (i >= 0)
+    //    {
+    //        if (vocbs[i].Level == VocabularyLevel.Hard)
+    //        {
+    //            vocbs = vocbs.Concat(Enumerable.Repeat(vocbs[i], 500)).ToList();
+    //        }
+            
+    //        i--;
+    //    }
+        
+    //}
 
     private void NavigateToVocDetail(long id)
     {

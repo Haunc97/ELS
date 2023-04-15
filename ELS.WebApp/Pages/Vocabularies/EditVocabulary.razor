@@ -13,7 +13,7 @@
                 ToastDisplayToggled="@(() => showSuccessToast = false)">
 </ToastComponent>
 <br />
-@if(Model != null)
+@if (Model != null)
 {
     <EditForm Model="Model" OnValidSubmit="SaveVocabulary">
         <DataAnnotationsValidator></DataAnnotationsValidator>
@@ -83,12 +83,29 @@
                 </div>
             </div>
             <div class="col-6">
+                
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-lg-6">
                 <div class="form-group">
                     <label for="des">Description</label>
                     <InputTextArea id="des"
-                                   rows="5"
+                                   rows="4"
                                    placeholder="Enter description"
                                @bind-Value="Model.Description"
+                                   class="form-control">
+                    </InputTextArea>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label for="ex">Example</label>
+                    <InputTextArea id="ex"
+                                   rows="4"
+                                   placeholder="Enter examples"
+                               @bind-Value="Model.Example"
                                    class="form-control">
                     </InputTextArea>
                 </div>
@@ -124,7 +141,8 @@
                     Classification = (int)vocb.Classification,
                     Description = vocb.Description,
                     Level = (int)vocb.Level,
-                    Phonetics = vocb.Phonetics
+                    Phonetics = vocb.Phonetics,
+                    Example = vocb.Example
                 };
         }
     }
@@ -139,7 +157,8 @@
             (VocabularyLevel)Model.Level,
             "System",
             Model.Phonetics,
-            Model.Description);
+            Model.Description,
+            Model.Example);
 
         var vocId = await Mediator.Send(model);
 
@@ -179,5 +198,8 @@
 
         [StringLength(512)]
         public string Description { get; set; }
+
+        [StringLength(512)]
+        public string Example { get; set; }
     }
 }

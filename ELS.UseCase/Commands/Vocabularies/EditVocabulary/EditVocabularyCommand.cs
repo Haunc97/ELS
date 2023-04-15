@@ -11,6 +11,7 @@ namespace ELS.UseCase.Commands.Vocabularies.EditVocabulary
         VocabularyLevel Level,
         string UpdatedBy,
         string Phonetics = "",
-        string Description = ""
+        string Description = "",
+        string Example = ""
         ) : ICommand<long>;
 }

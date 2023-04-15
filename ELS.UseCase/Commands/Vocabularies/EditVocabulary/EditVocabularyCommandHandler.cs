@@ -24,6 +24,7 @@ namespace ELS.UseCase.Commands.Vocabularies.EditVocabulary
                 vocb.Level = request.Level;
                 vocb.UpdatedOn = DateTime.UtcNow;
                 vocb.UpdatedBy = request.UpdatedBy;
+                vocb.Example = request.Example;
 
                 await vocabularyRepository.UpdateAsync(vocb);
             }

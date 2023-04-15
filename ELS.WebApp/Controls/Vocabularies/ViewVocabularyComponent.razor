@@ -1,0 +1,46 @@
+﻿@using System.ComponentModel.DataAnnotations;
+@using ELS.UseCase.Utils;
+
+<!-- Modal -->
+<div class="@modalClassName" id="viewVocabularyDetailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Vocabulary Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="term">@Vocabulary?.Term</p>
+                <p class="class">@(Vocabulary?.Classification.GetAttribute<DisplayAttribute>().Name)</p>
+                <p class="phonetics">@Vocabulary?.Phonetics</p>
+                <p>@Vocabulary?.Definition</p>
+                <p class="desc">@Vocabulary?.Description</p>
+                <p class="example">@Vocabulary?.Example</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="Close">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsDisplay { get; set; } = false;
+
+    [Parameter]
+    public Vocabulary? Vocabulary { get; set; } = null;
+
+    [Parameter]
+    public EventCallback<bool> OnToggleDisplay { get; set; }
+
+    private string modalClassName => IsDisplay ? "modal fade show" : "modal fade";
+
+    private async Task Close()
+    {
+        IsDisplay = false;
+        await OnToggleDisplay.InvokeAsync(false);
+    }
+}

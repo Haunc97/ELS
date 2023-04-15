@@ -22,6 +22,7 @@ namespace ELS.UseCase.Commands.Vocabularies.AddVocabulary
                 Classification = request.Classification,
                 Level = request.Level,
                 Description = request.Description,
+                Example = request.Example,
                 Status = true,
                 CreatedBy = request.CreatedBy,
                 CreatedOn = DateTime.UtcNow

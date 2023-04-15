@@ -10,5 +10,6 @@ namespace ELS.UseCase.Commands.Vocabularies.AddVocabulary
         VocabularyLevel Level,
         string CreatedBy,
         string Phonetics = "",
-        string Description = "") : ICommand<long>;
+        string Description = "",
+        string Example = "") : ICommand<long>;
 }
