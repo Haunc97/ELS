@@ -1,0 +1,97 @@
+﻿.modal {
+    z-index: 1072;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    display: none;
+    overflow: hidden;
+    outline: 0;
+}
+
+#testResultModal {
+    display: none;
+}
+
+    #testResultModal.show {
+        display: block;
+        padding-right: 17px;
+    }
+
+.fade {
+    opacity: 0;
+    transition: opacity .15s linear;
+}
+
+    .fade.show {
+        opacity: 1;
+    }
+
+.modal-open .modal {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.modal.show .modal-dialog {
+    -webkit-transform: translate(0,0);
+    transform: translate(0,0);
+    opacity: 1;
+}
+
+.modal.fade .modal-dialog {
+    transition: transform .3s ease-out,-webkit-transform .3s ease-out;
+}
+
+label {
+    font-weight: bold;
+}
+
+button.close {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    font-size: 1.5rem;
+    -webkit-appearance: none;
+}
+
+
+
+.term {
+    font-size: 36px;
+    color: #1d2a57;
+    font-weight: 400;
+    margin-bottom: 0;
+}
+
+.class {
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 700;
+    color: #1d2a57;
+}
+
+.phonetics {
+    font-size: .875rem;
+    color: #1d2a57;
+}
+
+.desc {
+    margin-top: 10px;
+    font-size: 18px;
+    line-height: 1.5;
+    font-weight: 700;
+    color: #1d2a57;
+}
+
+.example {
+    font-style: italic;
+    vertical-align: initial;
+    font-size: 17px;
+    line-height: 1.4;
+    color: #1d2a57;
+}

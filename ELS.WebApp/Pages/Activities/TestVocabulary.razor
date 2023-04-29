@@ -1,0 +1,137 @@
+﻿@page "/test"
+@inject IMediator Mediator
+@inject NavigationManager NavigationManager
+@using ELS.UseCase.Utils;
+@using ELS.WebApp.Controls.Questions
+@using ELS.WebApp.Models;
+@using static ELS.WebApp.Controls.Questions.SingleChoiceQuestionComponent;
+
+<h3>Test</h3>
+<br />
+@if (questions != null && questions.Any())
+{
+    @for (int i = 0; i < questions.Count; i++)
+    {
+        @if (questions[i].Type == QuestionType.SingleSelection)
+        {
+            <SingleChoiceQuestionComponent @key="i" Question="questions[i]" OnSelected="OnAnswerChanged" IsSubmitted="isSubmitted"></SingleChoiceQuestionComponent>
+        }
+        else if (questions[i].Type == QuestionType.TextInput)
+        {
+            <TextInputQuestionComponent @key="i" Question="questions[i]" OnChanged="OnAnswerChanged" IsSubmitted="isSubmitted"></TextInputQuestionComponent>
+        }
+        <br />
+    }
+
+    <div class="d-flex justify-content-end">
+        <div class="btn-container">
+            @if (!isSubmitted)
+            {
+                <button type="button" class="btn btn-primary" @onclick="Submit">Submit</button>
+                <button type="submit" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+            }
+        </div>
+    </div>
+}
+
+<TestResultModalComponent CorrectCount="correctCount"
+                          QuestionCount="questions.Count"
+                          IsOpen="isOpenResult"
+                          OnClosed="OnResultClosed"
+                          OnReseted="OnResetClicked"
+                          OnRetried="OnRetryClicked">
+</TestResultModalComponent>
+
+@code {
+    private List<QuestionModel> questions = new();
+
+    private const int QUESTION_QTY = 10;
+
+    private int correctCount = 0;
+
+    private bool isSubmitted = false;
+
+    private bool isOpenResult = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var vocabs = await Mediator.Send(new Queries.Vocabularies.SearchVocabularies.SearchVocabulariesQuery());
+        var toTestVocabs = vocabs.GetRandomSublist(10);
+        List<QuestionType> qnTypes = new List<QuestionType> { QuestionType.SingleSelection, QuestionType.TextInput };
+
+        var random = new Random();
+        for (int i = 0; i < toTestVocabs.Count; i++)
+        {
+            QuestionModel questionModel = new()
+                {
+                    No = i + 1,
+                    Term = toTestVocabs[i].Definition,
+                    Definition = toTestVocabs[i].Term,
+                    Type = qnTypes[random.Next(qnTypes.Count)]
+                };
+
+            // add correct option
+            questionModel.Options = new List<string>() { questionModel.Definition };
+
+            // add random options
+            var a = vocabs.Where(x => string.IsNullOrWhiteSpace(x.Term)).ToList();
+            List<string> definitons = vocabs.Select(x => x.Term).Where(x => x.ToLower().Trim() != questionModel.Definition.ToLower().Trim()).ToList();
+            var rndOptions = definitons.GetRandomSublist(3);
+            questionModel.Options.AddRange(rndOptions);
+
+            // shuffle option list
+            questionModel.Options.Shuffle<string>();
+
+            questions.Add(questionModel);
+        }
+    }
+
+    private void OnAnswerChanged(AnswerModel data)
+    {
+        var qn = questions.First(x => x.No == data.QuestionNo);
+        qn.Answer = data.Answer;
+    }
+
+    private void Submit()
+    {
+        this.isSubmitted = true;
+        questions.ForEach(x => x.IsCorrect = x.Definition.Trim().ToLower() == x.Answer.Trim().ToLower());
+        correctCount = questions.Count(x => x.IsCorrect);
+        isOpenResult = true;
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    private void OnResultClosed(bool isClosed)
+    {
+        this.isOpenResult = !isClosed;
+    }
+
+    private async Task OnResetClicked()
+    {
+        // set back to default
+        questions = new();
+        correctCount = 0;
+        isSubmitted = false;
+        isOpenResult = false;
+
+        // init data
+        await this.OnInitializedAsync();
+    }
+
+    private void OnRetryClicked()
+    {
+        // set back to default
+        questions.Shuffle();
+        correctCount = 0;
+        isSubmitted = false;
+        isOpenResult = false;
+    }
+}

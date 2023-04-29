@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ELS.Persistence", "ELS.Infr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ELS.Infrastructure", "ELS.Infrastructure", "{3DFA7934-662D-446B-848F-212496F119D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ELS.Excel", "ELS.Excel\ELS.Excel.csproj", "{598B323A-7C0B-4469-89DA-848131F13DBF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ELS.Excel", "ELS.Excel\ELS.Excel.csproj", "{598B323A-7C0B-4469-89DA-848131F13DBF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

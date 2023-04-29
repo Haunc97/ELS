@@ -10,11 +10,12 @@
 
 <div class="row">
     <div class="col-sm">
-        <h2>List of Vocabularies (@(vocabularies != null ? vocabularies.Count : 0))</h2>
+        <h3 class="page-title">List of Vocabularies (@(vocabularies != null ? vocabularies.Count : 0))</h3>
     </div>
     <div class="col-sm d-flex justify-content-end">
         <div class="btn-container">
-            <button type="button" class="btn btn-success" @onclick="AddVocabulary">Add Vocabulary</button>
+            <button type="button" class="btn btn-success" @onclick="AddVocabulary">Add</button>
+            <button type="button" class="btn btn-success" @onclick="ImportVocabulary">Import</button>
             <button type="button" class="btn btn-primary" @onclick="LearnVocabulary">Learn</button>
         </div>
     </div>
@@ -45,8 +46,8 @@
                     <td>@(item.Classification.GetAttribute<DisplayAttribute>().Name)</td>
                     <td>@item.Level</td>
                     <td>
-                        <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => EditVocabulary(item.Id))">Edit</button>
-                        <button type="button" class="btn btn-sm btn-danger" @onclick="@(() => DeleteVocabulary(item.Id))">Remove</button>
+                        <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => EditVocabulary(item.Id))"><span class="oi oi-pencil"></span></button>
+                        <button type="button" class="btn btn-sm btn-danger" @onclick="@(() => DeleteVocabulary(item.Id))"><span class="oi oi-trash"></span></button>
                     </td>
                 </tr>
             }
@@ -103,6 +104,11 @@
     private void AddVocabulary()
     {
         NavigationManager.NavigateTo("/addvocabulary");
+    }
+
+    private void ImportVocabulary()
+    {
+        NavigationManager.NavigateTo("/importvocabularies");
     }
 
     private void LearnVocabulary()

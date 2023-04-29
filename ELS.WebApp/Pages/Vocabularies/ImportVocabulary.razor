@@ -1,18 +1,22 @@
 ﻿@page "/importvocabularies"
 @using Microsoft.AspNetCore.Mvc;
+@inject NavigationManager NavigationManager;
 @inject IMediator Mediator
 
 <h3>Import Vocabulary</h3>
 
 <InputFile OnChange="HandleSelection" />
 <br />
-<div class="mt-4">
-    <button type="button"
-            class="btn btn-primary"
-            disabled="@(selectedFile == null)"
-            @onclick="Import">
-        Import
-    </button>
+<div class="d-flex justify-content-start mt-4">
+    <div class="btn-container">
+        <button type="button"
+                class="btn btn-primary"
+                disabled="@(selectedFile == null)"
+                @onclick="Import">
+            Import
+        </button>
+        <button type="submit" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+    </div>
 </div>
 
 @code {
@@ -41,5 +45,10 @@
 
         var byteArray = ms.ToArray();
         await Mediator.Send(new Commands.Vocabularies.ImportVocabulary.ImportVocabularyCommand(byteArray, "System"));
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/vocabularies");
     }
 }

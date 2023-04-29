@@ -7,12 +7,13 @@
 @inject NavigationManager NavManager
 
 <h3>Learn Vocabulary</h3>
-@if(stdSet != null)
-{
-    <p class="topic-title">Topic: <a href="editstudyset/@stdSet.Id">@stdSet.Title</a></p>
-}
 <br />
 <LearnCardComponent SearchingFunc="SearchVocabularies" GoDetailFunc="NavigateToVocDetail" BgImgs="bgImgs"></LearnCardComponent>
+<br />
+@if (stdSet != null)
+{
+    <p class="topic-title text-center">Topic: <a href="editstudyset/@stdSet.Id">@stdSet.Title</a></p>
+}
 
 @code {
     public string[] bgImgs = { "/imgs/learn-bg.jpg", "/imgs/learn-bg-1.jpg", "/imgs/learn-bg-2.jpg" };
