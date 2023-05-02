@@ -21,15 +21,18 @@
             <div class="row">
                 @for (int i = 0; i < Question.Options.Count; i++)
                 {
-                    <div @key="i" class="form-check col-lg-6">
+                    <div @key="@(QuestionId + "_" + i)" class="form-check col-lg-6">
                         <input @onchange="@((ChangeEventArgs args) => OnOptionSelected(args))"
                                type="radio"
                                class="form-check-input"
-                               name="@Question.No"
-                               id="@Question.No"
+                               name="@(QuestionId + "_" + Question.No)"
+                               id="@(QuestionId + "_" + Question.No)"
                                disabled="@IsSubmitted"
                                value="@Question.Options[i]">
-                        <label class="@(IsSubmitted && !Question.IsCorrect && Question.Options[i].ToLower().Trim() == Question.Definition.ToLower().Trim() ? "text-success fw-bold form-check-label" : "form-check-label")" for="@Question.No">@Question.Options[i]</label>
+                        <label class="@(IsSubmitted && !Question.IsCorrect && Question.Options[i].ToLower().Trim() == Question.Definition.ToLower().Trim() ? "text-success fw-bold form-check-label" : "form-check-label")"
+                               for="@Question.No">
+                            @Question.Options[i]
+                        </label>
                     </div>
                 }
             </div>
@@ -41,6 +44,9 @@
 @code {
     [Parameter]
     public QuestionModel Question { get; set; }
+
+    [Parameter]
+    public string QuestionId { get; set; }
 
     [Parameter]
     public bool IsSubmitted { get; set; } = false;

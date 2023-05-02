@@ -17,7 +17,8 @@ namespace ELS.UseCase.Queries.StudySets.SearchStudySets
         {
             var studSets = await studySetRepository.GetListAsync(x => x.Status
                                                           && (string.IsNullOrWhiteSpace(request.Title) || x.Title.ToLower().IndexOf(request.Title.ToLower()) >= 0),
-                                                          includes: y => y.Include(x => x.StudySetVocabularies).ThenInclude(x => x.Vocabulary));
+                                                          includes: y => y.Include(x => x.StudySetVocabularies).ThenInclude(x => x.Vocabulary),
+                                                          orderBy: y => y.OrderBy(x => x.Title));
             return studSets;
         }
     }

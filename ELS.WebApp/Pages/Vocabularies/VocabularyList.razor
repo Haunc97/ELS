@@ -1,6 +1,7 @@
 ﻿@page "/vocabularies"
 @using ELS.UseCase.Utils;
 @using System.ComponentModel.DataAnnotations;
+@using ELS.WebApp.Models;
 @using static ELS.WebApp.Controls.Vocabularies.SearchVocabulariesComponent;
 
 @inject NavigationManager NavigationManager;
@@ -14,9 +15,9 @@
     </div>
     <div class="col-sm d-flex justify-content-end">
         <div class="btn-container">
-            <button type="button" class="btn btn-success" @onclick="AddVocabulary">Add</button>
-            <button type="button" class="btn btn-success" @onclick="ImportVocabulary">Import</button>
-            <button type="button" class="btn btn-primary" @onclick="LearnVocabulary">Learn</button>
+            <button type="button" class="btn btn-success" @onclick="AddVocabulary"><span class="oi oi-plus"></span></button>
+            <button type="button" class="btn btn-success" @onclick="ImportVocabulary"><span class="oi oi-cloud-upload"></span></button>
+            <button type="button" class="btn btn-primary" @onclick="LearnVocabulary"><span class="oi oi-layers"></span></button>
         </div>
     </div>
 </div>
@@ -85,7 +86,7 @@
         vocabularies = await Mediator.Send(request);
     }
 
-    private async Task OnSearchVocabularies(SearchVocabularyForm searchFrm)
+    private async Task OnSearchVocabularies(SearchVocabularyModel searchFrm)
     {
         await SearchVocabularies(searchFrm.Term, searchFrm.Classification, searchFrm.Level);
     }

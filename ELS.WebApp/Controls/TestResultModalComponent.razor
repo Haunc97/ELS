@@ -1,9 +1,9 @@
 ﻿<div class="@modalClassName" id="testResultModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary text-light fw-bold">
                 <h5 class="modal-title" id="exampleModalLongTitle">Result</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="Close">
+                <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close" @onclick="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -15,9 +15,8 @@
                 </p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="Reset">Reset</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="Retry">Retry</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="Close">Close</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal" @onclick="Retry"><span class="oi oi-reload"></span> Retry</button>
+                <button type="button" class="btn btn-success" data-dismiss="modal" @onclick="Continue"><span class="oi oi-arrow-circle-right"></span> Continue</button>
             </div>
         </div>
     </div>
@@ -37,7 +36,7 @@
     public EventCallback<bool> OnClosed { get; set; }
 
     [Parameter]
-    public EventCallback OnReseted { get; set; }
+    public EventCallback OnContinued { get; set; }
 
     [Parameter]
     public EventCallback OnRetried { get; set; }
@@ -53,9 +52,9 @@
         OnClosed.InvokeAsync(true);
     }
 
-    private void Reset()
+    private void Continue()
     {
-        OnReseted.InvokeAsync();
+        OnContinued.InvokeAsync();
     }
 
     private void Retry()

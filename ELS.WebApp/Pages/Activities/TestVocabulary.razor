@@ -14,11 +14,21 @@
     {
         @if (questions[i].Type == QuestionType.SingleSelection)
         {
-            <SingleChoiceQuestionComponent @key="i" Question="questions[i]" OnSelected="OnAnswerChanged" IsSubmitted="isSubmitted"></SingleChoiceQuestionComponent>
+            <SingleChoiceQuestionComponent @key="i"
+                               QuestionId="@sharedQuestionId"
+                               Question="questions[i]"
+                               OnSelected="OnAnswerChanged"
+                               IsSubmitted="isSubmitted">
+            </SingleChoiceQuestionComponent>
         }
         else if (questions[i].Type == QuestionType.TextInput)
         {
-            <TextInputQuestionComponent @key="i" Question="questions[i]" OnChanged="OnAnswerChanged" IsSubmitted="isSubmitted"></TextInputQuestionComponent>
+            <TextInputQuestionComponent @key="i"
+                            Question="questions[i]"
+                            QuestionId="@sharedQuestionId"
+                            OnChanged="OnAnswerChanged"
+                            IsSubmitted="isSubmitted">
+            </TextInputQuestionComponent>
         }
         <br />
     }
@@ -32,7 +42,9 @@
             }
             else
             {
-                <button type="submit" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                <button type="button" class="btn btn-warning" @onclick="OnRetryClicked"><span class="oi oi-reload"></span> Retry</button>
+                <button type="button" class="btn btn-success" @onclick="OnContinueClicked"><span class="oi oi-arrow-circle-right"></span> Continue</button>
+                <button type="submit" class="btn btn-secondary" @onclick="Cancel"><span class="oi oi-circle-x"></span> Cancel</button>
             }
         </div>
     </div>
@@ -42,7 +54,7 @@
                           QuestionCount="questions.Count"
                           IsOpen="isOpenResult"
                           OnClosed="OnResultClosed"
-                          OnReseted="OnResetClicked"
+                          OnContinued="OnContinueClicked"
                           OnRetried="OnRetryClicked">
 </TestResultModalComponent>
 
@@ -56,6 +68,8 @@
     private bool isSubmitted = false;
 
     private bool isOpenResult = false;
+
+    public string sharedQuestionId { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -114,7 +128,7 @@
         this.isOpenResult = !isClosed;
     }
 
-    private async Task OnResetClicked()
+    private async Task OnContinueClicked()
     {
         // set back to default
         questions = new();
@@ -128,8 +142,15 @@
 
     private void OnRetryClicked()
     {
-        // set back to default
+        sharedQuestionId = Guid.NewGuid().ToString();
         questions.Shuffle();
+        // set back to default
+        for (int i = 0; i < questions.Count; i++)
+        {
+            questions[i].IsCorrect = false;
+            questions[i].Answer = string.Empty;
+            questions[i].No = i + 1;
+        }
         correctCount = 0;
         isSubmitted = false;
         isOpenResult = false;

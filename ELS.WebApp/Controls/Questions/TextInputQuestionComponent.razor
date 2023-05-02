@@ -22,10 +22,11 @@
             <div class="form-group">
                 <input type="text"
                        class="form-control"
-                       id="answer"
+                       id="@(QuestionId + "_" + Question.No)"
                        aria-describedby="answerHelp"
                        placeholder="Enter your answer"
                        disabled="@IsSubmitted"
+                       value="@Question.Answer"
                        @onchange="@((ChangeEventArgs args) => OnValueChange(args))">
                 @if (!Question.IsCorrect && IsSubmitted)
                 {
@@ -40,6 +41,9 @@
 @code {
     [Parameter]
     public QuestionModel Question { get; set; }
+
+    [Parameter]
+    public string QuestionId { get; set; }
 
     [Parameter]
     public bool IsSubmitted { get; set; } = false;

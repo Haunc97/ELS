@@ -12,7 +12,7 @@
         <h3>List of Study Sets</h3>
     </div>
     <div class="col-sm d-flex justify-content-end">
-        <button type="button" class="btn btn-success" @onclick="AddStudySet">New set</button>
+        <button type="button" class="btn btn-success" @onclick="AddStudySet"><span class="oi oi-plus"></span></button>
     </div>
 </div>
 <br />
@@ -35,9 +35,9 @@
                     <td>@item.Description</td>
                     <td>@(item.StudySetVocabularies?.Count(x => x.Vocabulary.Status) ?? 0) Vocabularies</td>
                     <td>
-                        <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => LearnStudySet(item.Id))">Learn</button>
-                        <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => EditStudySet(item.Id))">Edit</button>
-                        <button type="button" class="btn btn-sm btn-danger" @onclick="@(() => DeleteStudySet(item.Id))">Remove</button>
+                        <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => LearnStudySet(item.Id))"><span class="oi oi-layers"></span></button>
+                        <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => EditStudySet(item.Id))"><span class="oi oi-pencil"></span></button>
+                        <button type="button" class="btn btn-sm btn-danger" @onclick="@(() => DeleteStudySet(item.Id))"><span class="oi oi-trash"></span></button>
                     </td>
                 </tr>
             }
