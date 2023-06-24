@@ -11,7 +11,7 @@
 
 <div class="row">
     <div class="col-sm">
-        <h3 class="page-title">List of Vocabularies (@(vocabularies != null ? vocabularies.Count : 0))</h3>
+        <h3 class="page-title">List of Vocabularies (@recordCount)</h3>
     </div>
     <div class="col-sm d-flex justify-content-end">
         <div class="btn-container">
@@ -54,7 +54,9 @@
             }
         </tbody>
     </table>
+    <PagingComponent PageTotal="pageTotal" CurrentPage="currentPage" OnGoNextPageClicked="GoNextPage" OnGoPreviousPageClicked="GoPreviousPage" OnGoToPageClicked="GoToPage"></PagingComponent>
 }
+
 <ViewVocabularyComponent IsDisplay="showVocabularyDetail"
                          Vocabulary="selectedVocabulary"
                          OnToggleDisplay="OnToggleViewDisplay">
@@ -68,27 +70,67 @@
 
 @code {
     private List<Vocabulary> vocabularies = null;
-    private bool showSuccessToast = false;
-    private bool showVocabularyDetail = false;
+
     private Vocabulary? selectedVocabulary = null;
+
+    private SearchVocabularyModel searchModel = new();
+
+    private bool showSuccessToast = false;
+
+    private bool showVocabularyDetail = false;
+
+    private int pageTotal = 0;
+
+    private int recordCount = 0;
+
+    private int currentPage = 1;
+
+    private const int PAGE_SIZE = 10;
 
     protected override async Task OnInitializedAsync()
     {
         await SearchVocabularies();
     }
 
-    private async Task SearchVocabularies(string term = "", WordClassType? classification = null, VocabularyLevel? level = null)
+    private async Task SearchVocabularies()
     {
-        var request = new Queries.Vocabularies.SearchVocabularies.SearchVocabulariesQuery(
-            Term: term,
-            Classification: classification,
-            Level: level);
-        vocabularies = await Mediator.Send(request);
+        var request = new Queries.Vocabularies.SearchPagingVocabularies.SearchPagingVocabulariesQuery(
+            currentPage,
+            PAGE_SIZE,
+            Term: searchModel.Term,
+            Classification: searchModel.Classification,
+            Level: searchModel.Level);
+        var response = await Mediator.Send(request);
+        vocabularies = response.Data;
+        pageTotal = response.PageTotal;
+        recordCount = response.Total;
     }
 
-    private async Task OnSearchVocabularies(SearchVocabularyModel searchFrm)
+    private async Task OnSearchVocabularies(SearchVocabularyModel data)
     {
-        await SearchVocabularies(searchFrm.Term, searchFrm.Classification, searchFrm.Level);
+        searchModel.Term = data.Term;
+        searchModel.Classification = data.Classification;
+        searchModel.Level = data.Level;
+        currentPage = 1;
+        await SearchVocabularies();
+    }
+
+    private async Task GoToPage(int page)
+    {
+        currentPage = page;
+        await SearchVocabularies();
+    }
+
+    private async Task GoNextPage()
+    {
+        currentPage += 1;
+        await SearchVocabularies();
+    }
+
+    private async Task GoPreviousPage()
+    {
+        currentPage -= 1;
+        await SearchVocabularies();
     }
 
     private void OnToggleViewDisplay(bool value)

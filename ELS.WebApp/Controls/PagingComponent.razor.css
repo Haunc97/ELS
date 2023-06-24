@@ -1,0 +1,7 @@
+﻿.pagination li {
+    cursor: pointer;
+}
+a.current {
+    font-weight: 700;
+    text-decoration: underline;
+}

@@ -29,6 +29,7 @@ builder.Services.AddMediatR(typeof(SearchVocabulariesQuery));
 
 builder.Services.AddTransient<IVocabularyRepository, VocabularyRepository>();
 builder.Services.AddTransient<IStudySetRepository, StudySetRepository>();
+builder.Services.AddTransient<ISentenceRepository, SentenceRepository>();
 builder.Services.AddTransient<IStudySetVocabularyRepository, StudySetVocabularyRepository>();
 builder.Services.AddTransient<IExcelReader, ExcelReader>();
 

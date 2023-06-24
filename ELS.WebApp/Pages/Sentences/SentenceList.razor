@@ -1,0 +1,147 @@
+﻿@page "/sentences"
+@using ELS.UseCase.Utils;
+@using System.ComponentModel.DataAnnotations;
+@using ELS.WebApp.Controls.Sentences
+@using ELS.WebApp.Models;
+@using static ELS.WebApp.Controls.Vocabularies.SearchVocabulariesComponent;
+
+@inject NavigationManager NavigationManager;
+@inject IMediator Mediator
+
+<PageTitle>List of Sentences</PageTitle>
+
+<div class="row">
+    <div class="col-sm">
+        <h3 class="page-title">List of Sentences (@recordCount)</h3>
+    </div>
+    <div class="col-sm d-flex justify-content-end">
+        <div class="btn-container">
+            <button type="button" class="btn btn-success" @onclick="AddSentence"><span class="oi oi-plus"></span></button>
+            <button type="button" class="btn btn-primary" @onclick="LearnSentence"><span class="oi oi-layers"></span></button>
+        </div>
+    </div>
+</div>
+<br />
+<SearchSentencesComponent OnSearch="OnSearchSentences"></SearchSentencesComponent>
+<br />
+@if (sentences != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th width="22%">Term</th>
+                <th width="22%">Definition</th>
+                <th width="18%">Phonetics</th>
+                <th width="13%">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in sentences)
+            {
+                <tr id="@item.Id">
+                    <td width="300">@item.Term</td>
+                    <td width="300">@item.Definition</td>
+                    <td>@item.Phonetics</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => EditSentence(item.Id))"><span class="oi oi-pencil"></span></button>
+                        <button type="button" class="btn btn-sm btn-danger" @onclick="@(() => DeleteSentence(item.Id))"><span class="oi oi-trash"></span></button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <PagingComponent PageTotal="pageTotal" CurrentPage="currentPage" OnGoNextPageClicked="GoNextPage" OnGoPreviousPageClicked="GoPreviousPage" OnGoToPageClicked="GoToPage"></PagingComponent>
+}
+
+<ToastComponent Show="showSuccessToast"
+                Title="Sentence"
+                Message="Delete sentence successfully."
+                ToastDisplayToggled="@(() => showSuccessToast = false)">
+</ToastComponent>
+
+@code {
+    private List<Sentence> sentences = null;
+
+    private SearchSentenceModel searchModel = new();
+
+    private bool showSuccessToast = false;
+
+    private bool showVocabularyDetail = false;
+
+    private int pageTotal = 0;
+
+    private int recordCount = 0;
+
+    private int currentPage = 1;
+
+    private const int PAGE_SIZE = 10;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SearchSentences();
+    }
+
+    private async Task SearchSentences()
+    {
+        var request = new Queries.Sentences.SearchPagingSentences.SearchPagingSentencesQuery(
+            currentPage,
+            PAGE_SIZE,
+            Term: searchModel.Term);
+        var response = await Mediator.Send(request);
+        sentences = response.Data;
+        pageTotal = response.PageTotal;
+        recordCount = response.Total;
+    }
+
+    private async Task OnSearchSentences(SearchSentenceModel data)
+    {
+        searchModel.Term = data.Term;
+        currentPage = 1;
+        await SearchSentences();
+    }
+
+    private async Task GoToPage(int page)
+    {
+        currentPage = page;
+        await SearchSentences();
+    }
+
+    private async Task GoNextPage()
+    {
+        currentPage += 1;
+        await SearchSentences();
+    }
+
+    private async Task GoPreviousPage()
+    {
+        currentPage -= 1;
+        await SearchSentences();
+    }
+
+    private void OnToggleViewDisplay(bool value)
+    {
+        this.showVocabularyDetail = value;
+    }
+
+    private void AddSentence()
+    {
+        NavigationManager.NavigateTo("/addsentence");
+    }
+
+    private void LearnSentence()
+    {
+        NavigationManager.NavigateTo("/learn-sentence");
+    }
+
+    private void EditSentence(long id)
+    {
+        NavigationManager.NavigateTo($"/editsentence/{id}");
+    }
+
+    private async Task DeleteSentence(long id)
+    {
+        await Mediator.Send(new Commands.Sentences.DeleteSentence.DeleteSentenceCommand(id, "System"));
+        showSuccessToast = true;
+        await SearchSentences();
+    }
+}

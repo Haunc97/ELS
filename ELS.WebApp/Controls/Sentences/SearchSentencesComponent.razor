@@ -1,0 +1,60 @@
+﻿@using ELS.UseCase.Utils;
+@using System.ComponentModel.DataAnnotations;
+@using ELS.WebApp.Models;
+@using System.Timers;
+@implements IDisposable;
+
+<div class="row">
+    <div class="col-lg-3">
+        <label for="term">Term</label>
+        <input id="term"
+               type="text"
+               class="form-control"
+               placeholder="Type term here to search"
+               @oninput="ResetTimer" />
+    </div>
+</div>
+
+@code {
+    private SearchSentenceModel model = new SearchSentenceModel();
+
+    private Timer aTimer = default!;
+
+    [Parameter]
+    public EventCallback<SearchSentenceModel> OnSearch { get; set; }
+
+    protected override void OnInitialized()
+    {
+        aTimer = new Timer(1000);
+        aTimer.Elapsed += OnTermInputFinished;
+        aTimer.AutoReset = false;
+        base.OnInitialized();
+    }
+
+    void ResetTimer(ChangeEventArgs args)
+    {
+        this.model.Term = args.Value.ToString();
+        aTimer.Stop();
+        aTimer.Start();
+    }
+
+    private async void OnTermInputFinished(Object? source, ElapsedEventArgs e)
+    {
+        //To avoid the error that you are trying to modify the state of your component from a different thread than the one that is associated with the renderer.
+        // This can happen when you use a timer or a task that runs on a background thread.
+        // To fix this, you need to use InvokeAsync () to switch execution to the renderer's synchronization context when triggering rendering or component state
+        await InvokeAsync(async () =>
+        {
+            await SearchSentences();
+        });
+    }
+
+    private async Task SearchSentences()
+    {
+        await OnSearch.InvokeAsync(model);
+    }
+
+    void IDisposable.Dispose()
+        =>
+        aTimer?.Dispose();
+}

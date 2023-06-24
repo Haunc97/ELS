@@ -16,7 +16,7 @@
 }
 
 @code {
-    public string[] bgImgs = { "/imgs/learn-bg.jpg", "/imgs/learn-bg-1.jpg", "/imgs/learn-bg-2.jpg" };
+    public string[] bgImgs = { "/imgs/learn-bg.jpg", "/imgs/learn-bg-1.jpg", "/imgs/learn-bg-2.jpg", "/imgs/learn-bg-15.jpg", "/imgs/learn-bg-10.jpg" };
     private long? stdSetId = null;
     private StudySet stdSet = null;
 
@@ -77,21 +77,6 @@
         }
 
     }
-
-    //private void replicateByLevel(List<Vocabulary> vocbs)
-    //{
-    //    int i = vocbs.Count() - 1;
-    //    while (i >= 0)
-    //    {
-    //        if (vocbs[i].Level == VocabularyLevel.Hard)
-    //        {
-    //            vocbs = vocbs.Concat(Enumerable.Repeat(vocbs[i], 500)).ToList();
-    //        }
-            
-    //        i--;
-    //    }
-        
-    //}
 
     private void NavigateToVocDetail(long id)
     {

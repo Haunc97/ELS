@@ -16,6 +16,13 @@ namespace ELS.UseCase.PluginInterfaces.Repositories
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null);
 
+        Task<ListPaging<TEntity>> GetListPagingAsync(
+            int PageNumber,
+            int PageSize,
+            Expression<Func<TEntity, bool>>? filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null);
+
         /// <summary>
         /// Get entity as no tracking.
         /// </summary>
@@ -43,5 +50,14 @@ namespace ELS.UseCase.PluginInterfaces.Repositories
         /// </summary>
         /// <param name="entities"></param>
         Task RemoveRangeAsync(TEntity[] entities);
+    }
+
+    public class ListPaging<T> where T : Entity
+    {
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public int Total { get; set; }
+        public int PageTotal => ((Total - 1) / PageSize) + 1;
+        public List<T> Data { get; set; }
     }
 }

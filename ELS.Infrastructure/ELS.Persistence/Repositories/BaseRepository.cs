@@ -24,8 +24,29 @@ namespace ELS.Persistence.Repositories
 
             IQueryable<TEntity> query = GetQueryable(db, filter, orderBy, includes);
 
-            var result = query.AsNoTracking();
+            var result = query.AsNoTracking(); 
             return await result.ToListAsync();
+        }
+
+        public virtual async Task<ListPaging<TEntity>> GetListPagingAsync(
+            int PageNumber,
+            int PageSize,
+            Expression<Func<TEntity, bool>>? filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? includes = null)
+        {
+            using var db = DbContextFactory.CreateDbContext();
+
+            IQueryable<TEntity> query = GetQueryable(db, filter, orderBy, includes);
+            var dataCount = await query.CountAsync();
+            var data = await query.AsNoTracking().Skip(PageSize * (PageNumber - 1)).Take(PageSize).ToListAsync();
+            return new ListPaging<TEntity>()
+            {
+                PageNumber = PageNumber,
+                PageSize = PageSize,
+                Total = dataCount,
+                Data = data
+            };
         }
 
         public virtual async Task<TEntity?> GetAsync(

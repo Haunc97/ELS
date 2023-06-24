@@ -1,0 +1,86 @@
+﻿@page "/learn-sentence"
+@using Azure.Core;
+@using System.Web;
+@using static ELS.WebApp.Controls.LearnCardComponent;
+@inject IMediator Mediator
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavManager
+
+<h3>Learn Sentence</h3>
+<br />
+<LearnCardComponent SearchingFunc="SearchSentences" GoDetailFunc="NavigateToSentenceDetail" BgImgs="bgImgs"></LearnCardComponent>
+<br />
+@if (stdSet != null)
+{
+    <p class="topic-title text-center">Topic: <a href="editstudyset/@stdSet.Id">@stdSet.Title</a></p>
+}
+
+@code {
+    public string[] bgImgs = { "/imgs/learn-bg-4.jpg", "/imgs/learn-bg-5.jpg", "/imgs/learn-bg-6.jpg", "/imgs/learn-bg-7.jpg", "/imgs/learn-bg-10.jpg",
+    "/imgs/learn-bg-12.jpg", "/imgs/learn-bg-13.jpg", "/imgs/learn-bg-14.jpg", "/imgs/learn-bg-15.jpg", "/imgs/learn-bg-18.jpg", "/imgs/learn-bg-19.jpg",
+    "/imgs/learn-bg-20.jpg", "/imgs/learn-bg-22.jpg", "/imgs/learn-bg-24.jpg", "/imgs/learn-bg-25.jpg", "/imgs/learn-bg-27.jpg", "/imgs/learn-bg-29.jpg"};
+    private long? stdSetId = null;
+    private StudySet stdSet = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var query = NavManager.ToAbsoluteUri(NavManager.Uri).Query;
+        var queryParams = System.Web.HttpUtility.ParseQueryString(query);
+        if (long.TryParse(queryParams["stdSetId"], out long id))
+        {
+            stdSetId = id;
+            stdSet = await Mediator.Send(new Queries.StudySets.GetStudySetById.GetStudySetByIdQuery(stdSetId.Value));
+        }
+    }
+
+    private async Task<List<LearnCardItem>> SearchSentences()
+    {
+        List<Sentence> sentences = null;
+
+        if (stdSetId.HasValue)
+        {
+            //sentences = await Mediator.Send(new Queries.Vocabularies.GetVocabulariesByStudySet.GetVocabulariesByStudySetQuery(stdSetId.Value));
+        }
+        else
+        {
+            var allSentences = await Mediator.Send(new Queries.Sentences.SearchSentences.SearchSentencesQuery());
+
+            GetRandomSentences(allSentences, out sentences);
+        }
+
+        return sentences?.Select(x => new LearnCardItem(x.Definition, x.Term, x.Phonetics)).ToList();
+    }
+
+    private void GetRandomSentences(List<Sentence> sentences, out List<Sentence> rndSentences, int qty = 10)
+    {
+        rndSentences = new List<Sentence>();
+
+        if (sentences == null || !sentences.Any()) return;
+
+        if (sentences.Count > qty)
+        {
+            var rnd = new Random();
+
+            int i = 0;
+            while (i < qty)
+            {
+                var rndMember = sentences[rnd.Next(sentences.Count)];
+                if (!rndSentences.Contains(rndMember))
+                {
+                    rndSentences.Add(rndMember);
+                    i++;
+                }
+            }
+        }
+        else
+        {
+            rndSentences.AddRange(sentences);
+        }
+
+    }
+
+    private void NavigateToSentenceDetail(long id)
+    {
+        NavManager.NavigateTo($"/editsentence/{id}");
+    }
+}

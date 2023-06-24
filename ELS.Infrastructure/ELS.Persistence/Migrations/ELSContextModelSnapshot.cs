@@ -22,6 +22,43 @@ namespace ELS.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ELS.Core.Entities.Sentence", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Definition")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phonetics")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Term")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Sentences");
+                });
+
             modelBuilder.Entity("ELS.Core.Entities.StudySet", b =>
                 {
                     b.Property<long>("Id")
@@ -56,7 +93,34 @@ namespace ELS.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StudySets", (string)null);
+                    b.ToTable("StudySets");
+                });
+
+            modelBuilder.Entity("ELS.Core.Entities.StudySetSentence", b =>
+                {
+                    b.Property<long>("StudySetId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("SentenceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("StudySetId", "SentenceId");
+
+                    b.HasIndex("SentenceId");
+
+                    b.ToTable("StudySetSentences");
                 });
 
             modelBuilder.Entity("ELS.Core.Entities.StudySetVocabulary", b =>
@@ -83,7 +147,7 @@ namespace ELS.Persistence.Migrations
 
                     b.HasIndex("VocabularyId");
 
-                    b.ToTable("StudySetVocabularies", (string)null);
+                    b.ToTable("StudySetVocabularies");
                 });
 
             modelBuilder.Entity("ELS.Core.Entities.Vocabulary", b =>
@@ -132,7 +196,26 @@ namespace ELS.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Vocabularies", (string)null);
+                    b.ToTable("Vocabularies");
+                });
+
+            modelBuilder.Entity("ELS.Core.Entities.StudySetSentence", b =>
+                {
+                    b.HasOne("ELS.Core.Entities.Sentence", "Sentence")
+                        .WithMany("StudySetSentences")
+                        .HasForeignKey("SentenceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ELS.Core.Entities.StudySet", "StudySet")
+                        .WithMany("StudySetSentences")
+                        .HasForeignKey("StudySetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sentence");
+
+                    b.Navigation("StudySet");
                 });
 
             modelBuilder.Entity("ELS.Core.Entities.StudySetVocabulary", b =>
@@ -154,8 +237,15 @@ namespace ELS.Persistence.Migrations
                     b.Navigation("Vocabulary");
                 });
 
+            modelBuilder.Entity("ELS.Core.Entities.Sentence", b =>
+                {
+                    b.Navigation("StudySetSentences");
+                });
+
             modelBuilder.Entity("ELS.Core.Entities.StudySet", b =>
                 {
+                    b.Navigation("StudySetSentences");
+
                     b.Navigation("StudySetVocabularies");
                 });
 

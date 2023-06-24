@@ -10,8 +10,11 @@ namespace ELS.Persistence.Contexts
         }
 
         public DbSet<Vocabulary> Vocabularies { get; set; }
+        public DbSet<Sentence> Sentences { get; set; }
         public DbSet<StudySet> StudySets { get; set; }
         public DbSet<StudySetVocabulary> StudySetVocabularies { get; set; }
+        public DbSet<StudySetSentence> StudySetSentences { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

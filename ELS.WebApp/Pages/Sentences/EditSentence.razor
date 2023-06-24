@@ -1,0 +1,115 @@
+﻿@page "/editsentence/{SentId:long}"
+@using System.ComponentModel.DataAnnotations;
+@using ELS.UseCase.Utils;
+@using ELS.WebApp.Models;
+@inject NavigationManager NavigationManager;
+@inject IMediator Mediator
+
+<PageTitle>Edit Sentence</PageTitle>
+<h3>Edit Sentence</h3>
+
+<ToastComponent Show="showSuccessToast"
+                Title="Sentence"
+                Message="Update sentence successfully."
+                ToastDisplayToggled="@(() => showSuccessToast = false)">
+</ToastComponent>
+<br />
+@if (Model != null)
+{
+    <EditForm Model="Model" OnValidSubmit="SaveSentence">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group required">
+                    <label for="term">Term</label>
+                    <InputTextArea id="term"
+                                   placeholder="Enter English"
+                               @bind-Value="Model.Term"
+                                   class="form-control">
+                    </InputTextArea>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group required">
+                    <label for="def">Definition</label>
+                    <InputTextArea id="def"
+                                   placeholder="Vietnamese"
+                               @bind-Value="Model.Definition"
+                                   class="form-control">
+                    </InputTextArea>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label for="ipa">Phonetics</label>
+                    <InputTextArea id="ipa"
+                                   placeholder="IPA transcription"
+                               @bind-Value="Model.Phonetics"
+                                   class="form-control">
+                    </InputTextArea>
+                </div>
+            </div>
+            <div class="col-6">
+            </div>
+        </div>
+        <br />
+
+        @*Form footer*@
+        <div class="d-flex justify-content-end">
+            <div class="btn-container">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public long SentId { get; set; }
+    private EditSentenceModel Model { get; set; } = null;
+    private bool showSuccessToast = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var sent = await Mediator.Send(new Queries.Sentences.GetSentenceById.GetSentenceByIdQuery(SentId));
+        if (sent != null)
+        {
+            Model = new EditSentenceModel()
+                {
+                    Term = sent.Term,
+                    Definition = sent.Definition,
+                    Phonetics = sent.Phonetics
+                };
+        }
+    }
+
+    private async Task SaveSentence()
+    {
+        var model = new Commands.Sentences.EditSentence.EditSentenceCommand(
+            SentId,
+            Model.Term,
+            Model.Definition,
+            "System",
+            Model.Phonetics);
+
+        var senId = await Mediator.Send(model);
+
+        if (!showSuccessToast) showSuccessToast = true;
+    }
+
+    void ToastDisplayToggled(bool show)
+    {
+        showSuccessToast = show;
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/sentences");
+    }
+}

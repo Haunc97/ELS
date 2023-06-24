@@ -1,0 +1,96 @@
+﻿<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-end">
+
+        @if (CurrentPage > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" aria-label="Previous" @onclick="OnPrevious">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        }
+        @foreach (var page in pages.Select((value, index) => new { value, index }))
+        {
+            <li @key="page.index" class="page-item"><a class="@(page.value == CurrentPage ? "current page-link" : "page-link")" @onclick="@(() => OnGoTo(page.index))">@(page.value == -1 ? "..." : page.value)</a></li>
+        }
+
+        @if (CurrentPage < PageTotal)
+        {
+            <li class="page-item">
+                <a class="page-link" aria-label="Next" @onclick="OnNext">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
+@code {
+    [Parameter]
+    public int PageTotal { get; set; }
+
+    [Parameter]
+    public int CurrentPage { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnGoToPageClicked { get; set; }
+
+    [Parameter]
+    public EventCallback OnGoNextPageClicked { get; set; }
+
+    [Parameter]
+    public EventCallback OnGoPreviousPageClicked { get; set; }
+
+    public List<int> pages = new();
+
+    protected override void OnParametersSet()
+    {
+        pages = GetPages(CurrentPage, PageTotal);
+    }
+
+    private List<int> GetPages(int current, int total)
+    {
+        if (total <= 7) return Enumerable.Range(1, total).ToList();
+
+        if (current > 5)
+        {
+            if (current >= total - 4)
+            {
+                return new() { 1, -1, total - 4, total - 3, total - 2, total - 1, total };
+            }
+            else
+            {
+                return new() { 1, -1, current - 1, current, current + 1, -1, total };
+            }
+        }
+
+        return new() { 1, 2, 3, 4, 5, -1, total };
+    }
+
+    private void OnGoTo(int pageIndex)
+    {
+        int page = this.pages[pageIndex];
+        int currentPageIndex = this.pages.ToList().FindIndex(x => x == CurrentPage);
+        if (page == -1)
+        {
+            if (pageIndex > currentPageIndex)
+            {
+                page = this.pages[pageIndex - 1] + 1;
+            }
+            else
+            {
+                page = this.pages[pageIndex + 1] - 1;
+            }
+        }
+        this.OnGoToPageClicked.InvokeAsync(page);
+    }
+
+    public void OnNext()
+    {
+        this.OnGoNextPageClicked.InvokeAsync();
+    }
+
+    public void OnPrevious()
+    {
+        this.OnGoPreviousPageClicked.InvokeAsync();
+    }
+}

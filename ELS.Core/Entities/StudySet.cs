@@ -9,5 +9,6 @@ namespace ELS.Core.Entities
         public string Description { get; set; }
         public bool Status { get; set; }
         public ICollection<StudySetVocabulary> StudySetVocabularies { get; set; }
+        public ICollection<StudySetSentence> StudySetSentences { get; set;}
     }
 }
