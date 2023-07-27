@@ -48,7 +48,7 @@
             GetRandomSentences(allSentences, out sentences);
         }
 
-        return sentences?.Select(x => new LearnCardItem(x.Definition, x.Term, x.Phonetics)).ToList();
+        return sentences?.Select(x => new LearnCardItem(x.Definition, x.Term, $"/editsentence/{x.Id}", x.Phonetics)).ToList();
     }
 
     private void GetRandomSentences(List<Sentence> sentences, out List<Sentence> rndSentences, int qty = 10)

@@ -47,7 +47,7 @@
             GetRandomVocabularies(allVocs, out vocs);
         }
 
-        return vocs?.Select(x => new LearnCardItem(x.Definition, x.Term, x.Phonetics)).ToList();
+        return vocs?.Select(x => new LearnCardItem(x.Definition, x.Term, $"/editvocabulary/{x.Id}", x.Phonetics)).ToList();
     }
 
     private void GetRandomVocabularies(List<Vocabulary> vocbs, out List<Vocabulary> rndVocbs, int qty = 10)

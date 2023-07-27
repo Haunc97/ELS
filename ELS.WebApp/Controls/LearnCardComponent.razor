@@ -1,29 +1,36 @@
 ﻿@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
 
 @if (learnItems != null && learnItems.Any())
 {
     <div class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
-            @for (int i = 0; i < learnItems.Count; i++)
+
+            @foreach (var item in learnItems.Select((value, i) => new { i, value }))
             {
-                <div class="@GetItemStyleClass(i)" style="position: relative">
+                <div class="@GetItemStyleClass(item.i)" style="position: relative">
                     <img src="@randomBg" class="d-block w-100 card-bg">
                     <div id="vocabulary" @onclick="ToggleResult" class="card-content">
                         @if (!showResult)
                         {
-                            <p style="font-size: 2em;" class="font-weight-bold">@learnItems.ElementAt(i).Term</p>
+                            <p style="font-size: 2em;" class="font-weight-bold">@item.value.Term</p>
                         }
                         else
                         {
-                            <p style="font-size: 2em" class="font-weight-bold">@learnItems.ElementAt(i).Result</p>
-                            <p>@learnItems.ElementAt(i).Description</p>
+                            <p style="font-size: 2em" class="font-weight-bold">@item.value.Result</p>
+                            <p>@item.value.Description</p>
                         }
                     </div>
                     <div class="carousel-caption d-none d-md-block">
                         <p>@(current + 1) of @learnItems.Count</p>
+                        @if (!string.IsNullOrEmpty(@learnItems.ElementAt(current).Url))
+                        {
+                            <div class="justify-content-center d-flex"><a href="@learnItems.ElementAt(current).Url" target="blank"><span class="oi oi-external-link"></span></a></div>
+                        }
                     </div>
                 </div>
             }
+            
         </div>
         <button class="carousel-control-prev" type="button" data-target="#carouselExampleControls" data-slide="prev" @onclick="GoPrevious">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -33,6 +40,7 @@
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
             <span class="sr-only">Next</span>
         </button>
+        
     </div>
 }
 
@@ -99,5 +107,13 @@
         showResult = false;
     }
 
-    public record LearnCardItem(string Term, string Result, string Description = "");
+    public async void OpenDetail()
+    {
+        var openUrl = learnItems.ElementAt(current).Url;
+        await JSRuntime.InvokeAsync<object>("open", openUrl, "_blank");
+        //NavigationManager.NavigateTo(item.Url, new {tar});
+    }
+
+
+    public record LearnCardItem(string Term, string Result, string Url, string Description = "");
 }
